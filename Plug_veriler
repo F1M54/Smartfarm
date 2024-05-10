@@ -1,0 +1,40 @@
+import pandas as pd
+import time
+from pyHS100 import SmartPlug
+
+def fetch_data(plug_ip):
+    plug = SmartPlug(plug_ip)
+    try:
+        data = plug.get_emeter_realtime()
+        return data
+    except Exception as e:
+        print("Veri alınırken hata oluştu:", e)
+        return None
+
+def main():
+    plug_ip = "192.168.1.29"  # HS110 akıllı fişinizin IP adresini buraya girin
+    excel_filename = "veriler.xlsx"  # Excel dosyasının adı ve uzantısını belirtin
+    
+    # Excel dosyasını oluşturma
+    df = pd.DataFrame(columns=["voltage_mv", "current_ma", "power_mw", "total_wh"])
+    df.to_excel(excel_filename, index=False)
+    print("Excel dosyası oluşturuldu.")
+
+    # Belirli aralıklarla veri alarak DataFrame'e ekleme ve Excel dosyasına yazma
+    while True:
+        # API'den veri al
+        data = fetch_data(plug_ip)
+        if data:
+            # Verileri DataFrame'e ekleme
+            new_row = pd.DataFrame([data])
+            df = pd.concat([df, new_row], ignore_index=True)
+            
+            # DataFrame'i Excel dosyasına yazma
+            df.to_excel(excel_filename, index=False)
+            print("Veri Excel dosyasına yazıldı:", data)
+
+        # Belirli bir süre bekleyin (örneğin, 5 saniye)
+        time.sleep(5)
+
+if __name__ == "__main__":
+    main()
