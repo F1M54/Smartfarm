@@ -1,0 +1,22 @@
+import time
+from pyHS100 import SmartPlug
+
+def main():
+    plug_ip = "192.168.1.29"  # HS110 akıllı fişinizin IP adresini buraya girin
+    plug = SmartPlug(plug_ip)
+
+    # Her 5 saniyede bir veri güncelleme döngüsü
+    while True:
+        # HS110 akıllı fişinden anlık veri al
+        try:
+            results = plug.get_emeter_realtime()
+            print("Anlık veriler:", results)
+        except Exception as e:
+            print("Veri alınırken hata oluştu:", e)
+
+        # 5 saniye bekleyin
+        time.sleep(5)
+
+if __name__ == "__main__":
+    main()
+    
