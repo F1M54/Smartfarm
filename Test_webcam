@@ -1,0 +1,28 @@
+import os
+import time
+
+def capture_photo():
+    """
+    Function to capture a photo using fswebcam.
+    """
+    # Define the directory where the photo will be saved
+    save_directory = "/home/pc/images"
+    
+    # Create the directory if it doesn't exist
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+    
+    # Generate a unique filename for the photo based on the current date and time
+    file_name = os.path.join(save_directory, f"{time.strftime('%Y%m%d_%H%M%S')}.jpg")
+    
+    # Use fswebcam command to capture the photo and save it with the generated filename
+    os.system(f"fswebcam -r 1280x720 --no-banner {file_name}")
+
+
+while True:
+    
+    # Call the function to capture a single photo
+    capture_photo()
+
+    # Wait 1 hour
+    time.sleep(3600) 
