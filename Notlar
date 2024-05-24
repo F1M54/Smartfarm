@@ -1,0 +1,8 @@
+*** Hangi serial portta olduğumu görmek için command
+dmesg | grep ttyUSB
+
+*** Sanal ortam oluşturma
+python3 -m venv myenv
+
+*** Sanal ortamı aktifleştirme
+source myenv/bin/activate
