@@ -1,8 +1,8 @@
 /*
  * aht10.h
  *
- *  Created on: Sep 6, 2023
- *      Author: Atakan Ağcakaya
+ *  Created on:
+ *      Author: 
  *      This file was created for AHT10 temp&hum sensor. The I2C protocol was used.
  */
 
