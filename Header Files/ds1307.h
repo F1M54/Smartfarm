@@ -1,8 +1,8 @@
 /*
  * ds1307.h
  *
- *  Created on: Dec 6, 2023
- *      Author: Atakan
+ *  Created on:
+ *      Author:
  */
 
 #ifndef INC_DS1307_H_
