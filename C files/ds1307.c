@@ -1,8 +1,8 @@
 /*
  * ds1307.c
  *
- *  Created on: Dec 6, 2023
- *      Author: Atakan
+ *  Created on: 
+ *      Author:
  */
 
 #include "ds1307.h"
