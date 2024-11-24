@@ -1,0 +1,212 @@
+classdef app4 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure        matlab.ui.Figure
+        TemperatureBox  matlab.ui.control.Label
+        HumidityBox     matlab.ui.control.Label
+        WeatherBox      matlab.ui.control.Label
+        WeatherHeading  matlab.ui.control.Label
+        CityDropDown    matlab.ui.control.DropDown
+        CityownLabel    matlab.ui.control.Label
+        lblTIME         matlab.ui.control.Label
+        lblDATE         matlab.ui.control.Label
+    end
+
+    
+   properties (Access = private)
+        Timer % Timer object
+    end
+
+    methods (Access = private)
+        % Code to execute when the app is deleted
+        function appdelete(app)
+            % Stop and delete a timer if it exists
+            if isfield(app, 'Timer') && isvalid(app.Timer)
+                stop(app.Timer);
+                delete(app.Timer);
+            end
+        end
+
+        % Update date and time
+        function updateDateTime(app)
+            % Get current date and time
+            currentDate = datestr(now, 'dddd, mmmm dd, yyyy'); % Example: "Monday, November 24, 2024"
+            currentTime = datestr(now, 'HH:MM:SS PM');         % Example: "03:45:12 PM"
+
+            % Update the labels
+            app.lblDATE.Text = ['Date: ', currentDate];
+            app.lblTIME.Text = ['Time: ', currentTime];
+        end
+
+        % Fetch weather data
+        function [weatherCondition, humidity, temperature] = getWeatherData(app, city)
+            % Your OpenWeatherMap API key
+            apiKey = 'db8f06d2060111bfa12573556286b163';
+
+            % OpenWeatherMap API endpoint
+            baseUrl = 'http://api.openweathermap.org/data/2.5/weather';
+
+            % Construct the full API URL
+            url = sprintf('%s?q=%s&units=metric&appid=%s', baseUrl, city, apiKey);
+
+            try
+                % Fetch the weather data
+                response = webread(url);
+
+                % Extract details
+                weatherCondition = response.weather(1).description; % e.g., 'clear sky'
+                humidity = response.main.humidity; % e.g., 60
+                temperature = response.main.temp; % e.g., 22.5
+            catch
+                % Return empty values in case of an error
+                weatherCondition = 'N/A';
+                humidity = 'N/A';
+                temperature = 'N/A';
+            end
+        end
+    end
+    
+    
+
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Code that executes after component creation
+        function startupFcn(app)
+           % Update the date and time immediately
+            updateDateTime(app);
+
+            % Clear the weather boxes
+            app.WeatherBox.Text = 'Weather: ';
+            app.HumidityBox.Text = 'Humidity: ';
+            app.TemperatureBox.Text = 'Temperature: ';
+
+            % Set up a timer to update every second
+            app.Timer = timer('ExecutionMode', 'fixedRate', ...
+                              'Period', 1, ...
+                              'TimerFcn', @(~,~) updateDateTime(app));
+            start(app.Timer);
+        
+        
+        end
+
+        % Value changed function: CityDropDown
+        function CityDropDownValueChanged(app, event)
+           % Get the selected city
+    selectedCity = app.CityDropDown.Value;
+
+    % Check if a city is selected
+    if strcmp(selectedCity, 'Select a city')
+        % Clear the boxes if no city is selected
+        app.WeatherBox.Text = 'Weather: ';
+        app.HumidityBox.Text = 'Humidity: ';
+        app.TemperatureBox.Text = 'Temperature: ';
+    else
+        try
+            % Fetch weather data for the selected city
+            [weather, humidity, temperature] = app.getWeatherData(selectedCity);
+
+            % Update the boxes with weather details
+            app.WeatherBox.Text = ['Weather: ', weather];
+            app.HumidityBox.Text = ['Humidity: ', num2str(humidity), '%'];
+            app.TemperatureBox.Text = ['Temperature: ', num2str(temperature), '°C'];
+        catch
+            % Display an error message in case of failure
+            app.WeatherBox.Text = 'Weather: Error fetching data';
+            app.HumidityBox.Text = 'Humidity: N/A';
+            app.TemperatureBox.Text = 'Temperature: N/A';
+        end
+    end
+    
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 693 523];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create lblDATE
+            app.lblDATE = uilabel(app.UIFigure);
+            app.lblDATE.Position = [1 480 151 31];
+            app.lblDATE.Text = 'Date:';
+
+            % Create lblTIME
+            app.lblTIME = uilabel(app.UIFigure);
+            app.lblTIME.Position = [2 460 144 21];
+            app.lblTIME.Text = 'Time:';
+
+            % Create CityownLabel
+            app.CityownLabel = uilabel(app.UIFigure);
+            app.CityownLabel.HorizontalAlignment = 'right';
+            app.CityownLabel.Position = [4 430 26 22];
+            app.CityownLabel.Text = 'City';
+
+            % Create CityDropDown
+            app.CityDropDown = uidropdown(app.UIFigure);
+            app.CityDropDown.Items = {' ', 'Kayseri', 'Tokyo', 'Paris', 'Sakarya', 'Konya', 'Bursa'};
+            app.CityDropDown.ValueChangedFcn = createCallbackFcn(app, @CityDropDownValueChanged, true);
+            app.CityDropDown.Position = [52 430 100 22];
+            app.CityDropDown.Value = ' ';
+
+            % Create WeatherHeading
+            app.WeatherHeading = uilabel(app.UIFigure);
+            app.WeatherHeading.Position = [5 390 147 25];
+            app.WeatherHeading.Text = 'Weather Information';
+
+            % Create WeatherBox
+            app.WeatherBox = uilabel(app.UIFigure);
+            app.WeatherBox.Position = [6 369 140 22];
+            app.WeatherBox.Text = 'Weather';
+
+            % Create HumidityBox
+            app.HumidityBox = uilabel(app.UIFigure);
+            app.HumidityBox.Position = [6 348 140 22];
+            app.HumidityBox.Text = 'Humidity';
+
+            % Create TemperatureBox
+            app.TemperatureBox = uilabel(app.UIFigure);
+            app.TemperatureBox.Position = [6 327 140 22];
+            app.TemperatureBox.Text = 'Temperature';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app4
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            % Execute the startup function
+            runStartupFcn(app, @startupFcn)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
