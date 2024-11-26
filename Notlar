@@ -8,4 +8,4 @@ python3 -m venv myenv
 source myenv/bin/activate
 
 *** Rasp. dosya yollama
-pscp pc@192.168.54.168:/home/pc/images/*.jpg C:\Users\pc\Documents
+pscp pc@192.168.54.168:/home/pc/images/*.jpg C:\Users\pc\Desktop\RaspberryImages
