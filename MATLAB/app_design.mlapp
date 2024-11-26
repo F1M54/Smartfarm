@@ -1,41 +1,55 @@
-classdef app4 < matlab.apps.AppBase
+classdef app1 < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                    matlab.ui.Figure
         TabGroup                    matlab.ui.container.TabGroup
-        Tab1                        matlab.ui.container.Tab
-        StatusLighting              matlab.ui.control.Label
-        LightingSystemLabel         matlab.ui.control.Label
+        Tab                         matlab.ui.container.Tab
+        GetHeating                  matlab.ui.control.Button
+        HeatingSystemLabel          matlab.ui.control.Label
+        GetIrrigation               matlab.ui.control.Button
+        WaterTemperatureValue       matlab.ui.control.Label
+        StatusIrrigationValue       matlab.ui.control.Label
         WaterTemperatureGreenhouse  matlab.ui.control.Label
         StatusIrrigation            matlab.ui.control.Label
         IrrigationSystemLabel       matlab.ui.control.Label
+        LightingSystemLabel         matlab.ui.control.Label
+        StatusLighting              matlab.ui.control.Label
+        StatusLightingValue         matlab.ui.control.Label
+        GetLighting                 matlab.ui.control.Button
+        StatusVentilationValue      matlab.ui.control.Label
+        HumidityValue               matlab.ui.control.Label
         StatusHeating               matlab.ui.control.Label
         TemperatureGreenhouse       matlab.ui.control.Label
-        HeatingSystemLabel          matlab.ui.control.Label
-        AirQualityGreenhouse        matlab.ui.control.Label
-        HumidityGreenhouse          matlab.ui.control.Label
-        StatusVentilation           matlab.ui.control.Label
-        VentilationSystemLabel      matlab.ui.control.Label
-        SystemTimeandDateLabel      matlab.ui.control.Label
+        StatusHeatingValue          matlab.ui.control.Label
+        TemperatureValue            matlab.ui.control.Label
+        WeatherInformationLabel     matlab.ui.control.Label
         CityDropDown                matlab.ui.control.DropDown
         CityDropDownLabel           matlab.ui.control.Label
         TemperatureBox              matlab.ui.control.Label
         HumidityBox                 matlab.ui.control.Label
         WeatherBox                  matlab.ui.control.Label
-        WeatherHeading              matlab.ui.control.Label
-        lblTIME                     matlab.ui.control.Label
+        GetVentilation              matlab.ui.control.Button
+        AirValue                    matlab.ui.control.Label
+        AirQualityGreenhouse        matlab.ui.control.Label
+        HumidityGreenhouse          matlab.ui.control.Label
+        StatusVentilation           matlab.ui.control.Label
+        VentilationSystemLabel      matlab.ui.control.Label
         lblDATE                     matlab.ui.control.Label
+        lblTIME                     matlab.ui.control.Label
+        SystemTimeandDateLabel      matlab.ui.control.Label
+        Image                       matlab.ui.control.Image
         Tab2                        matlab.ui.container.Tab
-        GreenhouseViewLabel         matlab.ui.control.Label
+        GetButton                   matlab.ui.control.Button
+        GreenhouseImageLabel        matlab.ui.control.Label
+        GreenhouseImage             matlab.ui.control.Image
     end
 
     
-   properties (Access = private)
+ properties (Access = private)
         Timer % Timer object
     end
-
-    methods (Access = private)
+     methods (Access = private)
         % Code to execute when the app is deleted
         function appdelete(app)
             % Stop and delete a timer if it exists
@@ -82,17 +96,16 @@ classdef app4 < matlab.apps.AppBase
                 temperature = 'N/A';
             end
         end
+
     end
     
-    
-
 
     % Callbacks that handle component events
     methods (Access = private)
 
         % Code that executes after component creation
         function startupFcn(app)
-           % Update the date and time immediately
+            % Update the date and time immediately
             updateDateTime(app);
 
             % Clear the weather boxes
@@ -105,13 +118,13 @@ classdef app4 < matlab.apps.AppBase
                               'Period', 1, ...
                               'TimerFcn', @(~,~) updateDateTime(app));
             start(app.Timer);
-        
-        
+            
+            
         end
 
         % Value changed function: CityDropDown
         function CityDropDownValueChanged(app, event)
-           % Get the selected city
+                  % Get the selected city
     selectedCity = app.CityDropDown.Value;
 
     % Check if a city is selected
@@ -136,7 +149,55 @@ classdef app4 < matlab.apps.AppBase
             app.TemperatureBox.Text = 'Temperature: N/A';
         end
     end
-    
+        end
+
+        % Button pushed function: GetIrrigation
+        function GetIrrigationButtonPushed(app, event)
+            % Example: Fetch the water temperature from a mock function
+            water_temperature = 22; % Replace with actual logic
+
+            % Update the water temperature value in the label
+            app.WaterTemperatureValue.Text = sprintf('%.1f °C', water_temperature);
+
+            app.StatusIrrigationValue.Text = 'Inactive';
+        end
+
+        % Button pushed function: GetVentilation
+        function GetVentilationButtonPushed(app, event)
+             % Example: Fetch the humidity from a mock function
+            humidity = 48; % Replace with actual logic
+
+            % Update the humidity value in the label
+            app.HumidityValue.Text = sprintf('%.1f %%', humidity);
+
+            % Example: Fetch the AirQuality value from a mock function
+            AirQuality = 89; % Replace with actual logic
+
+            % Update the AirQuality value in the label
+            app.AirValue.Text = sprintf('%.1f %%', AirQuality);
+
+            app.StatusVentilationValue.Text = 'Inactive';
+        end
+
+        % Button pushed function: GetLighting
+        function GetLightingButtonPushed(app, event)
+            app.StatusLightingValue.Text = 'Active';
+        end
+
+        % Button pushed function: GetHeating
+        function GetHeatingButtonPushed(app, event)
+             app.StatusHeatingValue.Text = 'Inactive';
+
+             % Example: Fetch the water temperature from a mock function
+            temperature = 24; % Replace with actual logic
+
+            % Update the water temperature value in the label
+            app.TemperatureValue.Text = sprintf('%.1f °C', temperature);
+        end
+
+        % Button pushed function: GetButton
+        function GetButtonPushed(app, event)
+             app.GreenhouseImage.ImageSource = 'Greenhouse.png';
         end
     end
 
@@ -146,135 +207,226 @@ classdef app4 < matlab.apps.AppBase
         % Create UIFigure and components
         function createComponents(app)
 
+            % Get the file path for locating images
+            pathToMLAPP = fileparts(mfilename('fullpath'));
+
             % Create UIFigure and hide until all components are created
             app.UIFigure = uifigure('Visible', 'off');
-            app.UIFigure.Position = [100 100 608 320];
+            app.UIFigure.Position = [100 100 716 374];
             app.UIFigure.Name = 'MATLAB App';
 
             % Create TabGroup
             app.TabGroup = uitabgroup(app.UIFigure);
-            app.TabGroup.Position = [2 1 634 320];
+            app.TabGroup.Position = [1 7 716 368];
 
-            % Create Tab1
-            app.Tab1 = uitab(app.TabGroup);
-            app.Tab1.Title = 'Tab';
+            % Create Tab
+            app.Tab = uitab(app.TabGroup);
+            app.Tab.Title = 'Tab';
 
-            % Create lblDATE
-            app.lblDATE = uilabel(app.Tab1);
-            app.lblDATE.Position = [5 204 215 34];
-            app.lblDATE.Text = 'Date:';
-
-            % Create lblTIME
-            app.lblTIME = uilabel(app.Tab1);
-            app.lblTIME.Position = [5 237 206 25];
-            app.lblTIME.Text = 'Time:';
-
-            % Create WeatherHeading
-            app.WeatherHeading = uilabel(app.Tab1);
-            app.WeatherHeading.Position = [223 234 147 25];
-            app.WeatherHeading.Text = 'Weather Information';
-
-            % Create WeatherBox
-            app.WeatherBox = uilabel(app.Tab1);
-            app.WeatherBox.Position = [226 201 146 22];
-            app.WeatherBox.Text = 'Weather:';
-
-            % Create HumidityBox
-            app.HumidityBox = uilabel(app.Tab1);
-            app.HumidityBox.Position = [226 180 146 22];
-            app.HumidityBox.Text = 'Humidity:';
-
-            % Create TemperatureBox
-            app.TemperatureBox = uilabel(app.Tab1);
-            app.TemperatureBox.Position = [224 159 146 22];
-            app.TemperatureBox.Text = 'Temperature:';
-
-            % Create CityDropDownLabel
-            app.CityDropDownLabel = uilabel(app.Tab1);
-            app.CityDropDownLabel.HorizontalAlignment = 'right';
-            app.CityDropDownLabel.Position = [219 264 26 22];
-            app.CityDropDownLabel.Text = 'City';
-
-            % Create CityDropDown
-            app.CityDropDown = uidropdown(app.Tab1);
-            app.CityDropDown.Items = {' ', 'Kayseri', 'Tokyo', 'Paris', 'Sakarya', 'Konya', 'Bursa'};
-            app.CityDropDown.ValueChangedFcn = createCallbackFcn(app, @CityDropDownValueChanged, true);
-            app.CityDropDown.Position = [267 264 92 22];
-            app.CityDropDown.Value = ' ';
+            % Create Image
+            app.Image = uiimage(app.Tab);
+            app.Image.ScaleMethod = 'stretch';
+            app.Image.Position = [0 -6 716 350];
+            app.Image.ImageSource = fullfile(pathToMLAPP, 'pic5.png');
 
             % Create SystemTimeandDateLabel
-            app.SystemTimeandDateLabel = uilabel(app.Tab1);
-            app.SystemTimeandDateLabel.Position = [5 267 206 22];
+            app.SystemTimeandDateLabel = uilabel(app.Tab);
+            app.SystemTimeandDateLabel.FontColor = [0.9804 0.9804 0.9804];
+            app.SystemTimeandDateLabel.Position = [80 308 127 22];
             app.SystemTimeandDateLabel.Text = 'System Time and Date';
 
+            % Create lblTIME
+            app.lblTIME = uilabel(app.Tab);
+            app.lblTIME.Position = [32 292 218 16];
+            app.lblTIME.Text = 'Time:';
+
+            % Create lblDATE
+            app.lblDATE = uilabel(app.Tab);
+            app.lblDATE.Position = [32 270 218 15];
+            app.lblDATE.Text = 'Date:';
+
             % Create VentilationSystemLabel
-            app.VentilationSystemLabel = uilabel(app.Tab1);
-            app.VentilationSystemLabel.Position = [441 264 131 22];
+            app.VentilationSystemLabel = uilabel(app.Tab);
+            app.VentilationSystemLabel.FontColor = [1 1 1];
+            app.VentilationSystemLabel.Position = [55 191 131 22];
             app.VentilationSystemLabel.Text = 'Ventilation System';
 
             % Create StatusVentilation
-            app.StatusVentilation = uilabel(app.Tab1);
-            app.StatusVentilation.Position = [441 233 131 22];
+            app.StatusVentilation = uilabel(app.Tab);
+            app.StatusVentilation.Position = [41 160 158 22];
             app.StatusVentilation.Text = 'Status:';
 
             % Create HumidityGreenhouse
-            app.HumidityGreenhouse = uilabel(app.Tab1);
-            app.HumidityGreenhouse.Position = [441 212 131 22];
+            app.HumidityGreenhouse = uilabel(app.Tab);
+            app.HumidityGreenhouse.Position = [41 139 158 14];
             app.HumidityGreenhouse.Text = 'Humidity:';
 
             % Create AirQualityGreenhouse
-            app.AirQualityGreenhouse = uilabel(app.Tab1);
-            app.AirQualityGreenhouse.Position = [441 191 131 22];
+            app.AirQualityGreenhouse = uilabel(app.Tab);
+            app.AirQualityGreenhouse.Position = [41 122 158 14];
             app.AirQualityGreenhouse.Text = 'Air Quality:';
 
-            % Create HeatingSystemLabel
-            app.HeatingSystemLabel = uilabel(app.Tab1);
-            app.HeatingSystemLabel.Position = [3 91 118 22];
-            app.HeatingSystemLabel.Text = 'Heating System';
+            % Create AirValue
+            app.AirValue = uilabel(app.Tab);
+            app.AirValue.Position = [120 118 71 14];
+            app.AirValue.Text = '';
+
+            % Create GetVentilation
+            app.GetVentilation = uibutton(app.Tab, 'push');
+            app.GetVentilation.ButtonPushedFcn = createCallbackFcn(app, @GetVentilationButtonPushed, true);
+            app.GetVentilation.Position = [69 71 100 23];
+            app.GetVentilation.Text = 'Get';
+
+            % Create WeatherBox
+            app.WeatherBox = uilabel(app.Tab);
+            app.WeatherBox.Position = [319 247 146 22];
+            app.WeatherBox.Text = 'Weather:';
+
+            % Create HumidityBox
+            app.HumidityBox = uilabel(app.Tab);
+            app.HumidityBox.Position = [317 226 146 22];
+            app.HumidityBox.Text = 'Humidity:';
+
+            % Create TemperatureBox
+            app.TemperatureBox = uilabel(app.Tab);
+            app.TemperatureBox.Position = [317 205 146 22];
+            app.TemperatureBox.Text = 'Temperature:';
+
+            % Create CityDropDownLabel
+            app.CityDropDownLabel = uilabel(app.Tab);
+            app.CityDropDownLabel.HorizontalAlignment = 'right';
+            app.CityDropDownLabel.Position = [314 280 26 22];
+            app.CityDropDownLabel.Text = 'City';
+
+            % Create CityDropDown
+            app.CityDropDown = uidropdown(app.Tab);
+            app.CityDropDown.Items = {' ', 'Kayseri', 'Tokyo', 'Paris', 'Sakarya', 'Konya', 'Bursa'};
+            app.CityDropDown.ValueChangedFcn = createCallbackFcn(app, @CityDropDownValueChanged, true);
+            app.CityDropDown.Position = [362 280 92 22];
+            app.CityDropDown.Value = ' ';
+
+            % Create WeatherInformationLabel
+            app.WeatherInformationLabel = uilabel(app.Tab);
+            app.WeatherInformationLabel.FontColor = [1 1 1];
+            app.WeatherInformationLabel.Position = [340 302 114 22];
+            app.WeatherInformationLabel.Text = 'Weather Information';
+
+            % Create TemperatureValue
+            app.TemperatureValue = uilabel(app.Tab);
+            app.TemperatureValue.Position = [370 110 45 22];
+            app.TemperatureValue.Text = '';
+
+            % Create StatusHeatingValue
+            app.StatusHeatingValue = uilabel(app.Tab);
+            app.StatusHeatingValue.Position = [340 131 114 22];
+            app.StatusHeatingValue.Text = '';
 
             % Create TemperatureGreenhouse
-            app.TemperatureGreenhouse = uilabel(app.Tab1);
-            app.TemperatureGreenhouse.Position = [3 37 118 22];
+            app.TemperatureGreenhouse = uilabel(app.Tab);
+            app.TemperatureGreenhouse.Position = [292 110 74 22];
             app.TemperatureGreenhouse.Text = 'Temperature:';
 
             % Create StatusHeating
-            app.StatusHeating = uilabel(app.Tab1);
-            app.StatusHeating.Position = [3 58 118 22];
+            app.StatusHeating = uilabel(app.Tab);
+            app.StatusHeating.Position = [292 131 44 22];
             app.StatusHeating.Text = 'Status:';
 
+            % Create HumidityValue
+            app.HumidityValue = uilabel(app.Tab);
+            app.HumidityValue.Position = [114 135 72 22];
+            app.HumidityValue.Text = '';
+
+            % Create StatusVentilationValue
+            app.StatusVentilationValue = uilabel(app.Tab);
+            app.StatusVentilationValue.Position = [93 156 114 22];
+            app.StatusVentilationValue.Text = '';
+
+            % Create GetLighting
+            app.GetLighting = uibutton(app.Tab, 'push');
+            app.GetLighting.ButtonPushedFcn = createCallbackFcn(app, @GetLightingButtonPushed, true);
+            app.GetLighting.Position = [561 258 100 23];
+            app.GetLighting.Text = 'Get';
+
+            % Create StatusLightingValue
+            app.StatusLightingValue = uilabel(app.Tab);
+            app.StatusLightingValue.Position = [571 291 114 15];
+            app.StatusLightingValue.Text = '';
+
+            % Create StatusLighting
+            app.StatusLighting = uilabel(app.Tab);
+            app.StatusLighting.Position = [525 287 90 22];
+            app.StatusLighting.Text = 'Status:';
+
+            % Create LightingSystemLabel
+            app.LightingSystemLabel = uilabel(app.Tab);
+            app.LightingSystemLabel.FontColor = [1 1 1];
+            app.LightingSystemLabel.Position = [561 308 90 22];
+            app.LightingSystemLabel.Text = 'Lighting System';
+
             % Create IrrigationSystemLabel
-            app.IrrigationSystemLabel = uilabel(app.Tab1);
-            app.IrrigationSystemLabel.Position = [224 91 146 22];
+            app.IrrigationSystemLabel = uilabel(app.Tab);
+            app.IrrigationSystemLabel.FontColor = [1 1 1];
+            app.IrrigationSystemLabel.Position = [563 166 95 22];
             app.IrrigationSystemLabel.Text = 'Irrigation System';
 
             % Create StatusIrrigation
-            app.StatusIrrigation = uilabel(app.Tab1);
-            app.StatusIrrigation.Position = [224 58 146 22];
+            app.StatusIrrigation = uilabel(app.Tab);
+            app.StatusIrrigation.Position = [526 136 146 22];
             app.StatusIrrigation.Text = 'Status:';
 
             % Create WaterTemperatureGreenhouse
-            app.WaterTemperatureGreenhouse = uilabel(app.Tab1);
-            app.WaterTemperatureGreenhouse.Position = [224 37 146 22];
+            app.WaterTemperatureGreenhouse = uilabel(app.Tab);
+            app.WaterTemperatureGreenhouse.Position = [526 114 146 22];
             app.WaterTemperatureGreenhouse.Text = 'Water Temperature:';
 
-            % Create LightingSystemLabel
-            app.LightingSystemLabel = uilabel(app.Tab1);
-            app.LightingSystemLabel.Position = [441 91 90 22];
-            app.LightingSystemLabel.Text = 'Lighting System';
+            % Create StatusIrrigationValue
+            app.StatusIrrigationValue = uilabel(app.Tab);
+            app.StatusIrrigationValue.Position = [572 144 114 13];
+            app.StatusIrrigationValue.Text = '';
 
-            % Create StatusLighting
-            app.StatusLighting = uilabel(app.Tab1);
-            app.StatusLighting.Position = [441 58 90 22];
-            app.StatusLighting.Text = 'Status:';
+            % Create WaterTemperatureValue
+            app.WaterTemperatureValue = uilabel(app.Tab);
+            app.WaterTemperatureValue.Position = [640 118 51 18];
+            app.WaterTemperatureValue.Text = '';
+
+            % Create GetIrrigation
+            app.GetIrrigation = uibutton(app.Tab, 'push');
+            app.GetIrrigation.ButtonPushedFcn = createCallbackFcn(app, @GetIrrigationButtonPushed, true);
+            app.GetIrrigation.Position = [554 86 100 23];
+            app.GetIrrigation.Text = 'Get';
+
+            % Create HeatingSystemLabel
+            app.HeatingSystemLabel = uilabel(app.Tab);
+            app.HeatingSystemLabel.FontColor = [1 1 1];
+            app.HeatingSystemLabel.Position = [334 152 90 22];
+            app.HeatingSystemLabel.Text = 'Heating System';
+
+            % Create GetHeating
+            app.GetHeating = uibutton(app.Tab, 'push');
+            app.GetHeating.ButtonPushedFcn = createCallbackFcn(app, @GetHeatingButtonPushed, true);
+            app.GetHeating.Position = [329 71 100 23];
+            app.GetHeating.Text = 'Get';
 
             % Create Tab2
             app.Tab2 = uitab(app.TabGroup);
             app.Tab2.Title = 'Tab2';
+            app.Tab2.BackgroundColor = [0.8 0.8 0.8];
 
-            % Create GreenhouseViewLabel
-            app.GreenhouseViewLabel = uilabel(app.Tab2);
-            app.GreenhouseViewLabel.Position = [11 264 110 22];
-            app.GreenhouseViewLabel.Text = 'Greenhouse  View: ';
+            % Create GreenhouseImage
+            app.GreenhouseImage = uiimage(app.Tab2);
+            app.GreenhouseImage.ScaleMethod = 'stretch';
+            app.GreenhouseImage.Position = [240 59 323 249];
+
+            % Create GreenhouseImageLabel
+            app.GreenhouseImageLabel = uilabel(app.Tab2);
+            app.GreenhouseImageLabel.Position = [64 286 111 22];
+            app.GreenhouseImageLabel.Text = 'Greenhouse Image:';
+
+            % Create GetButton
+            app.GetButton = uibutton(app.Tab2, 'push');
+            app.GetButton.ButtonPushedFcn = createCallbackFcn(app, @GetButtonPushed, true);
+            app.GetButton.Position = [64 158 100 23];
+            app.GetButton.Text = 'Get';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
@@ -285,7 +437,7 @@ classdef app4 < matlab.apps.AppBase
     methods (Access = public)
 
         % Construct app
-        function app = app4
+        function app = app1
 
             % Create UIFigure and components
             createComponents(app)
