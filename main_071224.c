@@ -116,12 +116,12 @@ static void MX_TIM2_Init(void);
 void irrigationSystem(uint16_t minSF){
 
 
-	if(1<= minSF && minSF<8){ // Water to inside
+	if(2<= minSF && minSF<9){ // Water to inside
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
 	    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
 		flagIR = 1;
 	}
-	else if(52<=minSF && minSF<=58){
+	else if(50<=minSF && minSF<=56){
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
 		flagIR = 2;
@@ -144,7 +144,7 @@ void timer2Handler(void)
 {
   // TIM2 kesmesi için yapılacak işlemler
   timerVariable++;
-  if (timerVariable >= 60)
+  if (timerVariable >= 61)
   {
     timerVariable = 0; // 1 saat geçtiğinde sayaç sıfırlanır
   }
