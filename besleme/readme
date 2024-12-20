@@ -1,1 +1,2 @@
 İki motor da butona basıldığında 0.3 saniye boyunca çalışıyor.  
+.ioc açılmazsa klasörün ismini  ''besleme'' yerine ''pwm_motor'' yap.
