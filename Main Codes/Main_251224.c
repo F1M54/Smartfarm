@@ -59,6 +59,7 @@ DMA_HandleTypeDef hdma_tim8_ch3;
 DMA_HandleTypeDef hdma_tim8_ch2;
 
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 // systems flags for check they are working or not
@@ -102,6 +103,7 @@ static void MX_TIM9_Init(void);
 static void MX_I2C3_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -135,7 +137,7 @@ void irrigationSystem(uint16_t minSF){
 }
 
 void lightingSystem (uint8_t LED){ // system of lighting
-	if(2 <= LED && LED <= 731){
+	if(2 <= LED && LED <= 721){
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
 		flagLIGH = 1;
 	}
@@ -235,7 +237,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
 	  		  break;
 	  	  case 20: // water pump all stop
-			  rxFlag = 1;
+			  rxFlag = 0;
 			  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
 			  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
 			  break;
@@ -251,6 +253,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  		  rxFlag = 1;
 	  		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
 	  		  flagLIGH = 1;
+	  		  break;
 	  	  case 40: // reset lighting
 	  		  rxFlag=0;
 	  		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
@@ -300,6 +303,7 @@ void sensorData(){
 		getDHT11(&temp2, &hum2);
 		sprintf((char*)loraBuffer,"%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%d,%d,%d,%d,%d,%d\n",temp,temp2,hum,hum2,airQ,waterTemp,wL,hour,min,sec,flagIR,flagVENT,flagLIGH,flagHEAT);
 		HAL_UART_Transmit(&huart2, (uint8_t*)loraBuffer, (size_t)strlen((char*)loraBuffer), HAL_MAX_DELAY); // uart code for LORA communication
+		HAL_UART_Transmit(&huart3, (uint8_t*)loraBuffer, (size_t)strlen((char*)loraBuffer), HAL_MAX_DELAY);
 }
 
 /***** SYSTEMS*****/
@@ -319,11 +323,11 @@ void ventilationSystem (uint8_t min, float airQuality){
 }
 
 void heatingSystem (float temp){
-	if (temp < 18) {
+	if (temp < 20) {
 	        HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_RESET);
 	        flagHEAT = 1;
 	    }
-	else if (temp >= 23){
+	else if (temp >= 24){
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_SET);
 		flagHEAT = 0;
 	    }
@@ -368,6 +372,7 @@ int main(void)
   MX_I2C3_Init();
   MX_TIM8_Init();
   MX_TIM2_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   //sensor initalize
   initAHT10(&hi2c1);
@@ -379,6 +384,7 @@ int main(void)
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_SET); // heating
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET); // water pumps
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);  // water pumps
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 
   HAL_UART_Receive_IT(&huart2, rxTakinData,2); // for receiving data from uart
 
@@ -837,6 +843,39 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
+
+}
+
+/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -873,9 +912,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, heating_Pin|vent_Pin|ds18b20_Pin|relay1_Pin
